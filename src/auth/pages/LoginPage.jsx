@@ -45,12 +45,6 @@ export const LoginPage = () => {
       Swal.fire('Error en el registro', 'Contraseñas no son iguales', 'error');
     }
 
-    console.log({
-      registerName,
-      registerEmail,
-      registerPassword,
-      registerPassword2,
-    });
     startRegister({
       name: registerName,
       email: registerEmail,
