@@ -49,7 +49,7 @@ describe('Pruebas en el authSlice', () => {
     const errorMessage = 'Credenciales no validas';
     const state = authSlice.reducer(authenticatedState, onLogout(errorMessage));
     const newState = authSlice.reducer(state, clearErrorMessage());
-    console.log(newState);
+    // console.log(newState);
 
     expect(newState.errorMessage).toBe(undefined);
   });
