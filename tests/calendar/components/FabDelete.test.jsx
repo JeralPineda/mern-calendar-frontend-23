@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { FabDelete } from '../../../src/calendar/components/FabDelete';
 import { Provider } from 'react-redux';
 import { store } from '../../../src/store';
@@ -12,6 +12,6 @@ describe('Pruebas en <FabDelete />', () => {
         <FabDelete />
       </Provider>
     );
-    screen.debug();
+    // screen.debug();
   });
 });
