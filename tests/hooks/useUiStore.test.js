@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { useUiStore } from '../../src/hooks';
 import { Provider } from 'react-redux';
-import { store, uiSlice } from '../../src/store';
+import { uiSlice } from '../../src/store';
 import { configureStore } from '@reduxjs/toolkit';
 
 const getMockStore = (initialState) => {
