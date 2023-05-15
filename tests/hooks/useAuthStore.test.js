@@ -5,6 +5,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { useAuthStore } from '../../src/hooks/useAuthStore';
 import { Provider } from 'react-redux';
 import { testUserCredentials } from '../fixtures/testUser';
+import { calendarApi } from '../../src/api';
 
 const getMockStore = (initialState) => {
   return configureStore({
@@ -19,6 +20,8 @@ const getMockStore = (initialState) => {
 
 /* eslint-disable no-undef */
 describe('Pruebas en useAuthstore', () => {
+  beforeEach(() => localStorage.clear());
+
   test('debe de regresar los valores por defecto', () => {
     const mockStore = getMockStore({ ...initialState });
 
@@ -40,7 +43,6 @@ describe('Pruebas en useAuthstore', () => {
   });
 
   test('startLogin debe de realizar el login correctamente', async () => {
-    localStorage.clear();
     const mockStore = getMockStore(notAuthenticatedState);
     const { result } = renderHook(() => useAuthStore(), {
       wrapper: ({ children }) => (
@@ -63,7 +65,6 @@ describe('Pruebas en useAuthstore', () => {
   });
 
   test('startLogin debe de fallar la autenticación', async () => {
-    localStorage.clear();
     const mockStore = getMockStore(notAuthenticatedState);
     const { result } = renderHook(() => useAuthStore(), {
       wrapper: ({ children }) => (
@@ -89,5 +90,43 @@ describe('Pruebas en useAuthstore', () => {
 
     //simula el setTimeout, espero unos segundos
     await waitFor(() => expect(result.current.errorMessage).toBe(undefined));
+  });
+
+  test('startRegister debe de crear un usuario', async () => {
+    const newUser = {
+      email: 'algo@google.com',
+      password: '123456',
+      name: 'Test user 2',
+    };
+
+    const mockStore = getMockStore(notAuthenticatedState);
+    const { result } = renderHook(() => useAuthStore(), {
+      wrapper: ({ children }) => (
+        <Provider store={mockStore}>{children}</Provider>
+      ),
+    });
+
+    //Mock parcial para simular registro
+    const spy = jest.spyOn(calendarApi, 'post').mockReturnValue({
+      data: {
+        ok: true,
+        uid: '1234567892',
+        name: 'Test User',
+        token: 'ALGUN-TOKEN',
+      },
+    });
+
+    await act(async () => {
+      await result.current.startRegister(newUser); //Función asíncrona
+    });
+
+    const { errorMessage, status, user } = result.current;
+    expect({ errorMessage, status, user }).toEqual({
+      errorMessage: undefined,
+      status: 'authenticated',
+      user: { name: 'Test User', uid: '1234567892' },
+    });
+
+    spy.mockRestore(); //Destruir el spy para otras pruebas no exista o no se dispare
   });
 });
