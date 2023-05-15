@@ -99,7 +99,7 @@ describe('Pruebas en useAuthstore', () => {
       name: 'Test user 2',
     };
 
-    const mockStore = getMockStore(notAuthenticatedState);
+    const mockStore = getMockStore({ ...notAuthenticatedState });
     const { result } = renderHook(() => useAuthStore(), {
       wrapper: ({ children }) => (
         <Provider store={mockStore}>{children}</Provider>
@@ -128,5 +128,25 @@ describe('Pruebas en useAuthstore', () => {
     });
 
     spy.mockRestore(); //Destruir el spy para otras pruebas no exista o no se dispare
+  });
+
+  test('startRegister debe de fallar la creación', async () => {
+    const mockStore = getMockStore({ ...notAuthenticatedState });
+    const { result } = renderHook(() => useAuthStore(), {
+      wrapper: ({ children }) => (
+        <Provider store={mockStore}>{children}</Provider>
+      ),
+    });
+
+    await act(async () => {
+      await result.current.startRegister(testUserCredentials); //Función asíncrona
+    });
+
+    const { errorMessage, status, user } = result.current;
+    expect({ errorMessage, status, user }).toEqual({
+      errorMessage: 'El usuario ya existe',
+      status: 'not-authenticated',
+      user: {},
+    });
   });
 });
